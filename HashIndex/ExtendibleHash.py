@@ -9,8 +9,8 @@ class HashIndex:
             "1":Bucket()
         }
     
-    def hash(self,string:str):
-        return ' '.join(format(ord(x), 'b') for x in string).replace(" ","")
+    def hash(self,number:int):
+        return f'{number:04b}'
     
     # Expands the directory by doubling its entries
     def expand(self):
@@ -27,15 +27,17 @@ class HashIndex:
         self.table["0"+bucketHash] = Bucket(targetBucket.localDepth+1)
         
         for i in oldItems:
-            self.insert(i)
+            newBucketHash = self.hash(i)[-self.globalDepth:]
+            newTargetBucket = self.table[newBucketHash]
+            
+            newTargetBucket.items.append(i)
 
-        return
     
-    def insert(self,string:str):
-        bucketHash = self.hash(string)[-self.globalDepth:]
+    def insert(self,number:int):
+        bucketHash = self.hash(number)[-self.globalDepth:]
         targetBucket = self.table[bucketHash]
 
-        targetBucket.items.append(string)
+        targetBucket.items.append(number)
         
         # In case of overflow
         if len(targetBucket.items) > self.bucketSize:
@@ -49,8 +51,8 @@ class HashIndex:
 
     def print_buckets(self):
         for idx, bucket in self.table.items():
-            print("Bucket " + idx)
+            print("Diretório " + idx + " ld " + str(bucket.localDepth))
             items = ""
             for b in bucket.items:
-                items += b + " "
+                items += str(b) + " "
             print(items)
