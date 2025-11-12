@@ -12,8 +12,13 @@ class HashIndex:
     def hash(self,string:str):
         return ' '.join(format(ord(x), 'b') for x in string).replace(" ","")
     
+    # Expands the directory by doubling its entries
     def expand(self):
-        return
+        newTable = {}
+        for idx, bucket in self.table.items():
+            newTable["0"+idx] = bucket
+            newTable["1"+idx] = bucket
+        self.table = newTable
     
     def split(self):
         return
@@ -22,7 +27,9 @@ class HashIndex:
         bucketHash = self.hash(string)[-self.globalDepth:]
         targetBucket = self.table[bucketHash]
         
+        # In case of overflow
         if len(targetBucket.items) == self.bucketSize:
+            # If global depth needs to be increased
             if targetBucket.localDepth == self.globalDepth:
                 self.expand()
                 self.split()

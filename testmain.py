@@ -6,5 +6,6 @@ table.insert("michael")
 table.insert("Boc")
 table.insert("Boc")
 table.insert("Boc")
+table.insert("Boc")
 
 table.print_buckets()
