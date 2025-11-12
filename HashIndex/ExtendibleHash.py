@@ -19,22 +19,32 @@ class HashIndex:
             newTable["0"+idx] = bucket
             newTable["1"+idx] = bucket
         self.table = newTable
+        self.globalDepth += 1
     
-    def split(self):
+    def split(self,targetBucket, bucketHash):
+        oldItems = targetBucket.items
+        self.table["1"+bucketHash] = Bucket(targetBucket.localDepth+1)
+        self.table["0"+bucketHash] = Bucket(targetBucket.localDepth+1)
+        
+        for i in oldItems:
+            self.insert(i)
+
         return
     
     def insert(self,string:str):
         bucketHash = self.hash(string)[-self.globalDepth:]
         targetBucket = self.table[bucketHash]
+
+        targetBucket.items.append(string)
         
         # In case of overflow
-        if len(targetBucket.items) == self.bucketSize:
+        if len(targetBucket.items) > self.bucketSize:
+            print("Overflow!!")
             # If global depth needs to be increased
             if targetBucket.localDepth == self.globalDepth:
                 self.expand()
-                self.split()
+                self.split(targetBucket,bucketHash)
 
-        targetBucket.items.append(string)
 
 
     def print_buckets(self):
