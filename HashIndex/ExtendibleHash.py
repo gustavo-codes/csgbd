@@ -89,6 +89,43 @@ class HashIndex:
                 self.split(targetBucket, oldBucketHash) 
             else:
                 self.split(targetBucket, bucketHash)
+    
+    def remove(self,number:int):
+        bucketHash = self.hash(number)[-self.globalDepth:]
+        targetBucket = self.table[bucketHash]
+        
+        try:
+            targetBucket.items.remove(number)
+        except ValueError:
+            return
+    
+        # Check if merge needed
+        if not targetBucket.items and targetBucket.localDepth > 1:
+            prefix = bucketHash[1:] if self.globalDepth > targetBucket.localDepth else bucketHash[:-1]
+            
+            bit_de_divisao = bucketHash[-targetBucket.localDepth]
+            
+            if bit_de_divisao == '0':
+                par_hash_sufixo = '1' + prefix
+            else:
+                par_hash_sufixo = '0' + prefix
+                
+            par_hash = par_hash_sufixo.zfill(self.globalDepth)
+           
+            try:
+                parBucket = self.table[par_hash]
+            except KeyError:
+                return
+            
+            if parBucket.localDepth == targetBucket.localDepth:
+                parBucket.localDepth -= 1 
+                novo_sufixo_comum = bucketHash[-parBucket.localDepth:]
+                for hashKey in list(self.table.keys()):
+                    if hashKey[-parBucket.localDepth:] == novo_sufixo_comum:
+                        self.table[hashKey] = parBucket
+                print("Merged")
+                    
+
 
     def print_buckets(self):
         data = []
