@@ -1,12 +1,10 @@
 from HashIndex.ExtendibleHash import HashIndex
+import random
 
 table = HashIndex()
+randomNumbers = random.sample(range(1, 51), 50)
 
-table.insert(1)
-table.insert(2)
-table.insert(3)
-table.insert(4)
-table.insert(5)
-table.insert(7)
-
-table.print_buckets()
+for n in randomNumbers:
+    input(f"Pressione Enter para inserir {n} ({table.hash(n)})")
+    table.insert(n)
+    table.print_buckets()
