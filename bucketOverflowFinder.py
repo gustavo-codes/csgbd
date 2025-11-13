@@ -12,7 +12,6 @@ for attempt in range(1, 1001):
     for n in randomNumbers:
         table.insert(n)
 
-        # Verifica buckets com 4 itens
         for idx, bucket in table.table.items():
             if len(bucket.items) == 5:
                 overflow_rows.append({

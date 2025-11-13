@@ -24,7 +24,7 @@ class HashIndex:
         self.globalDepth += 1
     
 
-    def split(self, targetBucket, oldBucketHash, afterExpansion=False):
+    def split(self, targetBucket, oldBucketHash):
         oldItems = list(targetBucket.items) 
         targetBucket.items = [] 
         
@@ -50,6 +50,29 @@ class HashIndex:
             target = self.table[newBucketHash] 
             target.items.append(item)
 
+        # Re-Overflow check
+        buckets_to_check = [targetBucket, newBucket]
+        
+        for bucket in buckets_to_check:
+            if len(bucket.items) > self.bucketSize:
+                print("Overflow!! (Após Split)")
+                
+               
+                current_bucket_hash = next(
+                    (k for k, v in self.table.items() if v is bucket),
+                    None
+                )
+                
+                if not current_bucket_hash:
+                    return 
+
+                if bucket.localDepth == self.globalDepth:
+                    oldBucketHash = current_bucket_hash
+                    self.expand()
+                    self.split(bucket, oldBucketHash)
+                else:
+                    self.split(bucket, current_bucket_hash)
+
     def insert(self, number: int):
         bucketHash = self.hash(number)[-self.globalDepth:]
             
@@ -63,9 +86,9 @@ class HashIndex:
             if targetBucket.localDepth == self.globalDepth:
                 oldBucketHash = bucketHash 
                 self.expand() 
-                self.split(targetBucket, oldBucketHash, afterExpansion=True) 
+                self.split(targetBucket, oldBucketHash) 
             else:
-                self.split(targetBucket, bucketHash, afterExpansion=False)
+                self.split(targetBucket, bucketHash)
 
     def print_buckets(self):
         data = []
